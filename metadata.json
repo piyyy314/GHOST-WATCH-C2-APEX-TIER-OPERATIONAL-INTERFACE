@@ -1,0 +1,6 @@
+{
+  "name": "Ghost-Watch C2 Terminal",
+  "description": "Secure post-quantum command and control (C2) console for Canary Trap Operations and the Cognitive-Adaptive Deception Layer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
