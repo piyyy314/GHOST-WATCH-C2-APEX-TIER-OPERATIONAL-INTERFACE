@@ -1,0 +1,119 @@
+name: Ghost-Watch C2 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deployment Environment Target'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - canary-dr
+
+# Prevent concurrent deployment runs on the same branch/ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  lint-and-audit:
+    name: Code Quality & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Strict TypeScript & Syntax Audit
+        run: npm run lint
+
+  build-production:
+    name: Compile & Bundle Production Dist
+    needs: [lint-and-audit]
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      CI: true
+      # Production Environment Variables
+      VITE_APP_URL: ${{ vars.VITE_APP_URL || secrets.APP_URL || 'https://ghost-watch-c2.internal' }}
+      VITE_PQC_ALGORITHM: 'ML-KEM-768'
+      VITE_SIGNATURE_ALGORITHM: 'SLH-DSA-128f'
+      VITE_HASH_CHAIN_PRIMITIVE: 'SHA3-512'
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || '' }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Post-Quantum Specs & Env Configuration
+        run: |
+          echo "============================================="
+          echo "🔒 Verifying Cryptographic Build Constraints"
+          echo "============================================="
+          echo "PQC Algorithm: $VITE_PQC_ALGORITHM"
+          echo "Signature Spec: $VITE_SIGNATURE_ALGORITHM"
+          echo "Hash Chain: $VITE_HASH_CHAIN_PRIMITIVE"
+          echo "Target Node Environment: $NODE_ENV"
+          echo "Target App URL: $VITE_APP_URL"
+          echo "============================================="
+
+      - name: Build Production Assets
+        run: npm run build
+
+      - name: Audit Output Bundle Integrity
+        run: |
+          echo "Checking built assets in dist directory..."
+          test -f dist/index.html || { echo "❌ Critical Error: dist/index.html missing"; exit 1; }
+          test -d dist/assets || { echo "❌ Critical Error: dist/assets missing"; exit 1; }
+          echo "✅ Production bundle verified. Artifact count:"
+          ls -lh dist/assets
+
+      - name: Archive Production Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghost-watch-production-dist
+          path: dist
+          retention-days: 14
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [build-production]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

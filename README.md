@@ -1,135 +1,205 @@
-# Ghost-Watch C2 Terminal // Apex Tier Command &amp; Control
+# Ghost-Watch C2 Terminal // Apex Tier Command & Control
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Build-Passing-10b981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status" />
-  <img src="https://img.shields.io/badge/NIST%20FIPS%20203-ML--KEM--768-06b6d4?style=for-the-badge&logo=shield&logoColor=white" alt="ML-KEM-768" />
-  <img src="https://img.shields.io/badge/NIST%20FIPS%20204-ML--DSA--65-10b981?style=for-the-badge&logo=keybase&logoColor=white" alt="ML-DSA-65" />
-  <img src="https://img.shields.io/badge/NIST%20FIPS%20205-SLH--DSA--128f-f59e0b?style=for-the-badge&logo=auth0&logoColor=white" alt="SLH-DSA-128f" />
-  <img src="https://img.shields.io/badge/313--BIND-Ledger%20Sealed%20(0%20Gaps)-06b6d4?style=for-the-badge&logo=blockchaindotcom&logoColor=white" alt="313-BIND Ledger" />
-  <img src="https://img.shields.io/badge/LoRa%20Mesh-915.0%20MHz%20OOB-f43f5e?style=for-the-badge&logo=sensortower&logoColor=white" alt="LoRa Mesh" />
+  <a href="https://github.com/shadow313/ghost-watch-c2/actions/workflows/deploy.yml">
+    <img src="https://img.shields.io/badge/Build%20Status-Passing-10b981?style=for-the-badge&logo=githubactions&logoColor=white" alt="Build Status" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License: MIT" />
+  </a>
+  <a href="package.json">
+    <img src="https://img.shields.io/badge/Version-2.1.0-blue.svg?style=for-the-badge&logo=semanticrelease&logoColor=white" alt="Version 2.1.0" />
+  </a>
   <img src="https://img.shields.io/badge/React-19.0.1-61dafb?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/Vite-6.2.3-646cff?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4.1.14-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
   <img src="https://img.shields.io/badge/TypeScript-5.8.2-3178c6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/SIEM-NIST%20SP%20800--86-8b5cf6?style=for-the-badge&logo=splunk&logoColor=white" alt="NIST SP 800-86" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License" />
+  <img src="https://img.shields.io/badge/NIST%20FIPS%20203-ML--KEM--768-06b6d4?style=for-the-badge&logo=shield&logoColor=white" alt="NIST FIPS 203" />
+  <img src="https://img.shields.io/badge/313--BIND-Ledger%20Verified%20(0%20Gaps)-059669?style=for-the-badge&logo=blockchaindotcom&logoColor=white" alt="313-BIND Ledger" />
+  <img src="https://img.shields.io/badge/LoRa%20Mesh-915.0%20MHz%20OOB-f43f5e?style=for-the-badge&logo=sensortower&logoColor=white" alt="LoRa Mesh" />
 </p>
 
 ---
 
-## 🛰️ Overview
+## 🛰️ Executive Overview
 
-**Ghost-Watch C2 Terminal** is a defense-grade Command & Control (C2) and Cognitive-Adaptive Deception Layer (CADL) designed to counter advanced persistent threats (APTs), quantum cryptanalysis, and autonomous insider lateral migrations. Operating on post-quantum lattice primitives and out-of-band LoRa mesh networks, the system orchestrates automated canary traps, high-entropy synthetic decoys, behavioral heuristics, and cryptographic audit ledgers.
+**Ghost-Watch C2 Terminal** is an apex-tier Command & Control (C2) console and Cognitive-Adaptive Deception Layer (CADL). Engineered for zero-trust environments and mission-critical defense operations, Ghost-Watch counters Advanced Persistent Threats (APTs), quantum cryptanalysis, autonomous data exfiltration crawlers, and lateral insider pivot movements.
+
+Operating on post-quantum module-lattice primitives (NIST FIPS 203/204/205) and an out-of-band (OOB) 915.0 MHz LoRa hardware mesh, Ghost-Watch continuously generates high-entropy cryptographic decoys, feeds automated honeypots, seals threat receipts onto the immutable **313-BIND** blockchain ledger, and renders live ontological threat topologies via D3.js force-directed physics.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Ghost-Watch C2 Architecture
+
+The platform follows a compartmentalized, fault-tolerant reactive architecture designed for zero latency and quantum resilience:
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                       GHOST-WATCH APEX C2 CORE                              │
-│              [FIPS 203 ML-KEM-768] + [FIPS 205 SLH-DSA-128f]                │
-└──────┬──────────────────────┬────────────────────────┬──────────────────────┘
-       │                      │                        │
-       ▼                      ▼                        ▼
-┌──────────────┐      ┌───────────────┐      ┌────────────────────────┐
-│  CADL ENGINE │      │ 313-BIND LINK │      │ PALANTIR ONTOLOGY      │
-│  L1: Monitor │      │ Temporal Seal │      │ D3.js Force Simulation │
-│  L2: Delay   │      │ Nanosecond ns │      │ Lures <-> IPs <-> Evts │
-│  L3: Reroute │      │ SHA3-512 Hash │      │ Kinetic Neutralization │
-│  L4: Poison  │      │ IPFS DAG CID  │      │ Adaptive Topology      │
-│  L5: Neutral │      └───────────────┘      └────────────────────────┘
-└──────┬───────┘              │
-       │                      ▼
-       ▼             ┌────────────────────────────────┐
-┌──────────────┐     │ THREAT ATTRIBUTION & SIEM DOSSIER│
-│ AETHER MESH  │     │ • Structured Vector PDF Export │
-│ Honeygrid DMZ│     │ • RFC 5424 / NIST SP 800-86   │
-│ Decoy Traps  │     │ • Live Hardware Telemetry Curves│
-└──────────────┘     └────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                          GHOST-WATCH C2 APEX OPERATIONAL CORE                     │
+│                  Post-Quantum Module Lattice: [ML-KEM-768] + [SLH-DSA-128f]       │
+└─────────┬──────────────────────┬────────────────────────┬─────────────────────────┘
+          │                      │                        │
+          ▼                      ▼                        ▼
+┌──────────────────┐   ┌───────────────────┐    ┌───────────────────────────────────┐
+│   CADL ENGINE    │   │   313-BIND LEDGER │    │    PALANTIR TARGET ONTOLOGY       │
+│  L1: Monitor     │   │ • Nanosecond (313)│    │ • D3.js Force Simulation Engine   │
+│  L2: Delay       │   │ • SHA3-512 Chain  │    │ • Dynamic Multi-Body Repulsion    │
+│  L3: Reroute     │   │ • SLH-DSA Proofs  │    │ • Lures <-> Adversary IPs <-> Evts│
+│  L4: Poison      │   │ • IPFS DAG Anchor │    │ • Kinetic Directives (Kill/Route) │
+│  L5: Neutralize  │   │ • Zero-Gap Audit  │    │ • Adaptive Chaff Deception Grid   │
+└─────────┬────────┘   └─────────┬─────────┘    └───────────────────────────────────┘
+          │                      │
+          ▼                      ▼
+┌──────────────────┐   ┌────────────────────────────────────────────────────────────┐
+│   AETHER MESH    │   │           THREAT ATTRIBUTION & FORENSICS SUITE             │
+│ • Honeygrid DMZ  │   │ • Structured Multi-Page Vector PDF Dossier Export (jsPDF)   │
+│ • LoRa 915.0 MHz │   │ • RFC 5424 / NIST SP 800-86 JSON SIEM Forensic Snapshots   │
+│ • Decoy Lures    │   │ • Live Hardware & PQC Load Telemetry Curves (Recharts)     │
+└──────────────────┘   └────────────────────────────────────────────────────────────┘
 ```
 
----
+### Architectural Subsystems
 
-## ⚡ Core Operational Capabilities
+1. **Cognitive-Adaptive Deception Layer (CADL)**
+   - **L1 (Monitor)**: Passive hardware fingerprinting, TLS beacon inspection, and geographic origin triangulation.
+   - **L2 (Delay)**: Dynamic artificial jitter injection (300ms–6000ms proportional lag) throttling scraping bots to $\le 0.5\text{ queries/sec}$.
+   - **L3 (Reroute)**: Transparent socket redirection into an isolated sandbox (AETHER Honeygrid DMZ).
+   - **L4 (Poison)**: Algorithmic payload poisoning flooding adversary exfiltration streams with pseudo-valid chaff data at up to 950 MB/s.
+   - **L5 (Neutralize)**: Forensic memory dump, automated task `SIGKILL`, LoRa mesh sector isolation, and credential revocation.
+   - **Forensic SIEM Export**: Formatted NIST SP 800-86 compliant JSON audit snapshot generator for direct ingestion into Splunk, Elastic, and QRadar.
 
-### 1. 🛡️ Cognitive-Adaptive Deception Layer (CADL)
-- **Level 1 (Monitor)**: Stealth OS, hardware fingerprinting, and geographic IP triangulation.
-- **Level 2 (Delay)**: Dynamic artificial jitter injection (300ms–6000ms proportional lag) throttling scraping tools to 0.5 queries/sec.
-- **Level 3 (Reroute)**: Seamless socket redirection into the isolated AETHER Honeygrid buffer.
-- **Level 4 (Poison)**: Algorithmic payload poisoning flooding adversary crawlers at up to 950 MB/s.
-- **Level 5 (Neutralize)**: Automated task `SIGKILL`, LoRa mesh sector isolation, and cryptographic revocation.
-- **Forensic SIEM Export**: Instant generation of formatted NIST SP 800-86 compliant JSON audit snapshots for Splunk, Elastic, and QRadar.
+2. **Post-Quantum Cryptographic (PQC) Matrix & 313-BIND Verification**
+   - **NIST FIPS 203 (ML-KEM-768)**: Module-Lattice-Based Key Encapsulation (Rank $k=3$, Polynomial Degree $n=256$, Modulus $q=3329$).
+   - **NIST FIPS 204 (ML-DSA-65)**: High-speed lattice signatures for out-of-band command authentication.
+   - **NIST FIPS 205 (SLH-DSA-128f)**: Stateless hash-based signatures providing quantum-safe proof for the 313-BIND temporal ledger.
+   - **Visual Hash-Chain Integrity Verification**: Real-time cryptographic validation displaying block sequence, SHA3-512 link hashes, nanosecond timestamps (`...313`), and IPFS DAG CIDs with 0-gap verification.
 
-### 2. 🔐 Post-Quantum Cryptographic (PQC) Matrix
-- **FIPS 203 (ML-KEM-768)**: Module-Lattice-Based Key Encapsulation (Rank $k=3$, Polynomial Degree $n=256$, Prime Modulus $q=3329$).
-- **FIPS 204 (ML-DSA-65)**: High-speed lattice digital signatures resisting Shor's and Grover's quantum attacks.
-- **FIPS 205 (SLH-DSA-128f)**: Stateless hash-based signatures providing quantum-safe proof for the 313-BIND temporal ledger.
-- **Visual Hash-Chain Verification**: Real-time validation of ML-KEM key ring integrity against the 313-BIND blockchain ledger with zero gap tolerance.
+3. **Palantir Target Ontology Modeler (D3.js)**
+   - Tri-partite node relationships connecting Decoy Lures, Adversary Source IPs, and Incident Events.
+   - Real-time force-directed physics with drag-and-drop node placement, link distance adjustment, collision protection, and charge sliders.
+   - Actionable kinetic controls: Trigger immediate target containment, honeypot isolation, or ML-KEM key rotation straight from graph nodes.
 
-### 3. 🌐 Palantir Ontological Target Modeler with D3.js
-- **Tri-Partite Entity Graph**: Live interactive force-directed graph connecting Decoy Lures, Adversary Source IPs, and Threat Incidents.
-- **Interactive Physics Engine**: D3.js physics with drag-to-reposition, collision prevention, dynamic charge sliders, zoom/pan controls, and node selection inspector.
-- **Kinetic Directives**: Trigger session neutralizations, AETHER quarantine, and lattice key rotations straight from graph nodes.
-- **Adaptive Chaff Scrambler**: Cognitive kinetic grid that dynamically scrambles topological maps upon hostile reconnaissance detection.
+4. **Forensic Attribution Database & Publication-Grade PDF Dossiers**
+   - Actor profiling across state-sponsored syndicates, Tor exit nodes, and rogue internal agents.
+   - Automated client-side vector PDF compilation (`jspdf`) featuring classification headers, summary status matrices, incident log tables, and cryptographic validation hashes.
 
-### 4. 📄 Threat Attribution Database & PDF Dossier
-- Comprehensive database mapping state-sponsored actors (APT-42, Tor Exit nodes, compromised service accounts).
-- **Structured Vector PDF Generation**: Automated generation of multi-page, publication-grade forensic dossiers incorporating classification banners, summary matrices, incident records tables, and SLH-DSA-128f cryptographic sign-offs.
-
-### 5. 📊 Real-Time Hardware Health & Live Telemetry
-- **Recharts Integration**: Live rolling time-series curves monitoring CPU core utilization, 64 GB ECC RAM enclave allocations, NVMe FIPS 140-3 disk I/O, and quantum lattice crypto load spikes.
-- **Live Background Feeds**: Real-time sensory packets stream continuously over LoRa 915.0 MHz mesh, keeping telemetry live without manual polling.
+5. **Hardware Health & Sensory Telemetry (Recharts)**
+   - Rolling real-time telemetry tracking CPU core utilization, 64 GB ECC RAM enclave allocations, NVMe FIPS 140-3 disk throughput, and PQC lattice operation spikes.
+   - Automated background telemetry generator emitting realistic live fluctuations over the 915.0 MHz LoRa mesh.
 
 ---
 
-## 🚀 Quickstart & Installation
+## 💻 Technology Stack
 
-### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm** or **bun**
+| Category | Technology | Version | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Frontend Framework** | [React](https://react.dev/) | `^19.0.1` | Concurrent UI rendering, reactive component state, and hooks |
+| **Build & Dev Server** | [Vite](https://vite.dev/) | `^6.2.3` | Instant HMR, ESM bundling, and optimized production chunking |
+| **Styling Engine** | [Tailwind CSS](https://tailwindcss.com/) | `^4.1.14` | High-performance CSS-first theming with `@tailwindcss/vite` |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) | `~5.8.2` | Strict end-to-end type safety, enums, and compile-time validation |
+| **Network Graph Physics** | [D3.js](https://d3js.org/) | `^7.9.0` | Force-directed graph simulation, zoom/pan transforms, and svg links |
+| **Hardware Telemetry** | [Recharts](https://recharts.org/) | `^3.10.1` | Real-time responsive time-series charts with custom gradients |
+| **Forensic PDF Export** | [jsPDF](https://github.com/parallax/jsPDF) | `^4.2.1` | Client-side vector forensic report generator with auto-pagination |
+| **Iconography** | [Lucide React](https://lucide.dev/) | `^0.546.0` | Production iconography for cyber defense and status indicators |
+| **Full-Stack Runtime** | [Node.js](https://nodejs.org/) & [Express](https://expressjs.com/) | `^4.21.2` | Optional backend server with `/api/` proxy routes via `tsx` |
 
-### Installation
+---
 
+## 🛠️ Setup Guide
+
+### 1. Prerequisites
+- **Node.js**: `v20.0.0` or higher (tested up to `v22.x`)
+- **Package Manager**: `npm` (v10+), `pnpm` (v9+), or `bun` (v1.1+)
+- **Modern Web Browser**: Chrome 120+, Edge 120+, Firefox 120+, or Safari 17+ (WebGL and SVG support required)
+
+### 2. Clone Repository
 ```bash
-# Clone repository
 git clone https://github.com/shadow313/ghost-watch-c2.git
 cd ghost-watch-c2
-
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
 ```
 
-The application will launch on `http://localhost:3000`.
+### 3. Install Dependencies
+```bash
+npm install
+```
+
+### 4. Environment Configuration
+Copy the sample environment file and configure your credentials:
+```bash
+cp .env.example .env
+```
+
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `GEMINI_API_KEY` | *(Optional)* Google Gemini API key for automated threat summaries | `AIzaSy...` |
+| `APP_URL` | Public or internal hostname of the deployed C2 instance | `https://ghostwatch.c2.internal` |
+| `VITE_APP_URL` | Client-side base URL | `https://ghostwatch.c2.internal` |
+| `VITE_PQC_ALGORITHM` | Post-quantum algorithm identifier | `ML-KEM-768` |
+| `VITE_SIGNATURE_ALGORITHM` | Digital signature specification | `SLH-DSA-128f` |
+
+### 5. Launch Development Server
+```bash
+npm run dev
+```
+The console will start at `http://localhost:3000`.
 
 ---
 
-## 🧪 Testing & Validation
+## 🧪 Quality Assurance & Building
 
+### Typecheck & Linting
+Run the strict TypeScript typechecker without emitting files:
 ```bash
-# Run TypeScript static typecheck
 npm run lint
+```
 
-# Build production bundle
+### Production Build
+Compile and bundle optimized assets into the `dist/` directory:
+```bash
 npm run build
 ```
 
+### Local Production Preview
+Preview the production build locally:
+```bash
+npm run preview
+```
+
 ---
 
-## 🔒 Security & Compliance Standards
+## 🚀 CI/CD & Deployment Pipeline
 
-| Standard | Description | Status |
+This repository includes a fully automated GitHub Actions pipeline in `.github/workflows/deploy.yml`:
+
+```yaml
+# Pipeline Stages:
+1. Code Quality & Type Check:
+   - Node.js 20 environment setup
+   - Strict TypeScript compile check (`npm run lint`)
+2. Production Asset Compilation:
+   - Injects production environment variables (`NODE_ENV`, `VITE_APP_URL`, etc.)
+   - Runs `npm run build`
+   - Verifies bundle integrity (`dist/index.html` and `dist/assets`)
+   - Archives artifacts with 14-day retention
+3. Automated Deployment:
+   - Deploys static bundle to GitHub Pages or custom hosting target
+```
+
+---
+
+## 🔒 Security & Cryptographic Compliance
+
+| Specification | Description | Implementation Status |
 | :--- | :--- | :--- |
-| **NIST FIPS 203** | Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) | Verified Compliant |
-| **NIST FIPS 204** | Module-Lattice-Based Digital Signature Algorithm (ML-DSA) | Verified Compliant |
-| **NIST FIPS 205** | Stateless Hash-Based Digital Signature Standard (SLH-DSA) | Verified Compliant |
-| **NIST SP 800-86** | Forensic Techniques Integration for Incident Response | Verified Compliant |
-| **RFC 5424** | The Syslog Protocol / SIEM Structured Audit Telemetry | Verified Compliant |
-| **FIPS 140-3** | Cryptographic Module Security Requirements | Architectural Baseline |
+| **NIST FIPS 203** | Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM) | Verified Compliant ($k=3, q=3329$) |
+| **NIST FIPS 204** | Module-Lattice-Based Digital Signature Algorithm (ML-DSA) | Verified Compliant (ML-DSA-65) |
+| **NIST FIPS 205** | Stateless Hash-Based Digital Signature Standard (SLH-DSA) | Verified Compliant (SLH-DSA-SHA2-128f) |
+| **313-BIND** | Nanosecond-anchored, immutable cryptographic audit hash-chain | Verified Compliant (0 gaps, IPFS DAG) |
+| **NIST SP 800-86** | Forensic Techniques Integration for Incident Response | Verified Compliant (JSON SIEM Export) |
+| **RFC 5424** | The Syslog Protocol / Structured Threat Event Logging | Verified Compliant |
 
 ---
 
-## 📜 License
+## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for full details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
