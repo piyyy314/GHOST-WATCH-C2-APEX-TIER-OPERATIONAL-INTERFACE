@@ -24,6 +24,8 @@ import { CerberusScanner } from './components/cerberus';
 import { PqcMatrix } from './components/pqc';
 import { OmegaContingency } from './components/omega';
 import { ShieldMonitor } from './components/shield';
+import { SystemHealthWidget } from './components/system_health';
+import { AttributionDatabase } from './components/attribution';
 
 import { GhostWatchBridge } from './components/ghost_watch_bridge';
 import { temporalBinder } from './lib/temporal_binder';
@@ -53,7 +55,7 @@ export default function App() {
   const [profiles, setProfiles] = useState<BSAUProfile[]>(INITIAL_BSAU_PROFILES);
   const [rootKeyHash, setRootKeyHash] = useState('8d3f7a91ce42');
   const [isWiped, setIsWiped] = useState(false);
-  const [activeTab, setActiveTab] = useState<'CONSOLE' | 'ACTS' | 'ONTOLOGY' | 'CERBERUS' | 'PQC' | 'SHIELD' | 'BRIDGE' | 'OMEGA'>('CONSOLE');
+  const [activeTab, setActiveTab] = useState<'CONSOLE' | 'ACTS' | 'ONTOLOGY' | 'CERBERUS' | 'PQC' | 'SHIELD' | 'ATTRIBUTION' | 'BRIDGE' | 'OMEGA'>('CONSOLE');
 
   // Real-time UTC clock offset tracker
   const [timeStr, setTimeStr] = useState('2026-05-20 16:38:39 UTC');
@@ -70,8 +72,57 @@ export default function App() {
       const ss = String(now.getUTCSeconds()).padStart(2, '0');
       setTimeStr(`${yyyy}-${mm}-${dd} ${hh}:${min}:${ss} UTC`);
     }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+
+    // Live sensory packets streaming every 12 seconds
+    const liveStreamTimer = setInterval(() => {
+      if (isWiped) return;
+      const sensoryEvents = [
+        {
+          source: 'Green Pine RF Sensor 12',
+          desc: 'RF Spectrum telemetry scan nominal on 915.22 MHz. Frequency hop delta 0.02 kHz.',
+          act: 'RF frame signed and ingested',
+          lvl: ThreatLevel.INFO
+        },
+        {
+          source: 'Shadow DNS Node 01',
+          desc: 'Automated reverse DNS resolution query checked: audit-vault-49.ghost.watch.local [PASS].',
+          act: 'Cryptographic TTL refreshed',
+          lvl: ThreatLevel.INFO
+        },
+        {
+          source: 'LoRa Mesh Gateway HB-9982',
+          desc: 'OOB Mesh heartbeat broadcast received: RSSI=-74dBm, SNR=9.2dB.',
+          act: 'FIPS 203 encrypted tunnel verified',
+          lvl: ThreatLevel.INFO
+        }
+      ];
+      const randomEvent = sensoryEvents[Math.floor(Math.random() * sensoryEvents.length)];
+      const receipt = temporalBinder.bind_receipt({
+        event: 'SENSORY_HEARTBEAT_INGEST',
+        sensor: randomEvent.source,
+        cadl_level: 'L1-MONITOR'
+      }, 'live_telemetry_stream', 'HEARTBEAT_SYNC');
+
+      const newEvt: ThreatEvent = {
+        id: `EVT-LIVE-${Date.now().toString().slice(-6)}`,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        level: randomEvent.lvl,
+        source: randomEvent.source,
+        description: `${randomEvent.desc} [313-BIND: #${receipt.bindIndex}]`,
+        actionTaken: randomEvent.act,
+        bindIndex: receipt.bindIndex,
+        bindHash: receipt.bindHash,
+        chainBound: true
+      };
+
+      setThreatEvents(prev => [newEvt, ...prev.slice(0, 24)]);
+    }, 12000);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(liveStreamTimer);
+    };
+  }, [isWiped]);
 
   // Action: Add Lure
   const handleAddLure = (newLure: Lure) => {
@@ -423,6 +474,17 @@ export default function App() {
               🔗 313-BIND Bridge
             </button>
             <button
+              id="nav-btn-attribution"
+              onClick={() => setActiveTab('ATTRIBUTION')}
+              className={`px-4 py-2 border rounded font-bold transition-all cursor-pointer ${
+                activeTab === 'ATTRIBUTION'
+                  ? 'border-amber-500/50 bg-amber-950/20 text-amber-300 font-bold'
+                  : 'border-slate-800 bg-slate-900/10 text-slate-400 hover:border-slate-700'
+              }`}
+            >
+              🎯 Threat Attribution &amp; PDF Dossier
+            </button>
+            <button
               id="nav-btn-shield"
               onClick={() => setActiveTab('SHIELD')}
               className={`px-4 py-2 border rounded font-bold transition-all cursor-pointer ${
@@ -459,12 +521,16 @@ export default function App() {
             <>
               {activeTab === 'CONSOLE' && (
                 <div className="flex flex-col gap-6">
+                  {/* Real-Time System Health & Hardware Telemetry Widget (CPU, RAM, Disk curves) */}
+                  <SystemHealthWidget />
+
                   {/* Active CADL Engine integration within Main Console */}
                   <CadlManager
                     lures={lures}
                     onTriggerLure={handleTriggerLure}
                     onAddThreatEvent={(ev) => setThreatEvents((p) => [ev, ...p])}
                     profiles={profiles}
+                    threatEvents={threatEvents}
                   />
                 </div>
               )}
@@ -501,6 +567,14 @@ export default function App() {
                     const newRand = Math.floor(Math.random() * 999999).toString(16);
                     setRootKeyHash(newRand);
                   }}
+                />
+              )}
+
+              {activeTab === 'ATTRIBUTION' && (
+                <AttributionDatabase
+                  threatEvents={threatEvents}
+                  onUpdateThreatEvents={setThreatEvents}
+                  rootKeyHash={rootKeyHash}
                 />
               )}
 

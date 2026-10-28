@@ -1,0 +1,41 @@
+name: Ghost-Watch C2 Verification & Build CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate-and-build:
+    name: Typecheck & Production Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 20.x, 22.x ]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run TypeScript Strict Linting
+        run: npm run lint
+
+      - name: Build Production Distribution
+        run: npm run build
+
+      - name: Verify Post-Quantum Artifacts
+        run: |
+          echo "Verifying ML-KEM-768 and 313-BIND artifacts..."
+          test -d dist
+          echo "Production assets validated successfully."

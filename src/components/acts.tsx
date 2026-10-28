@@ -663,7 +663,7 @@ ${rawBase64}
                   <button
                     id="btn-crypt-verify"
                     type="button"
-                    onClick={() => alert(`Sovereign PQC Decoy Verification Service:\n\nPayload: ${generatedPqcData.name}\nStandard: ${generatedPqcData.algo}\nIntegrity Hash: ${generatedPqcData.sha255Hash || generatedPqcData.sha256Hash}\nStatus: PASS (No key degradation detected).`)}
+                    onClick={() => alert(`Sovereign PQC Decoy Verification Service:\n\nPayload: ${generatedPqcData.name}\nStandard: ${generatedPqcData.algo}\nIntegrity Hash: ${generatedPqcData.sha256Hash}\nStatus: PASS (No key degradation detected).`)}
                     className="flex items-center gap-1 px-2.5 py-1 bg-cyan-950/40 border border-cyan-800/40 rounded text-[9.5px] font-bold text-cyan-300 hover:bg-cyan-950 transition-colors cursor-pointer"
                   >
                     Verify Cryptography

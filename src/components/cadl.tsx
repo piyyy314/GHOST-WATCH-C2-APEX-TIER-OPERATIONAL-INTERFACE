@@ -3,14 +3,17 @@ import { Lure, LureStatus, ThreatEvent, ThreatLevel, BSAUProfile, RiskLevel } fr
 import { 
   Activity, Play, Shield, Terminal, ArrowRight, AlertTriangle, 
   Cpu, RefreshCw, Layers, Sliders, Database, Wifi, ShieldAlert, 
-  Zap, Globe, Gauge, Shuffle, CheckCircle, Flame, Eye, Sparkles
+  Zap, Globe, Gauge, Shuffle, CheckCircle, Flame, Eye, Sparkles,
+  Download, FileText, Check, Copy, X, ShieldCheck
 } from 'lucide-react';
+import { temporalBinder } from '../lib/temporal_binder';
 
 interface CadlProps {
   lures: Lure[];
   onTriggerLure: (lureId: string) => void;
   onAddThreatEvent: (event: ThreatEvent) => void;
   profiles?: BSAUProfile[];
+  threatEvents?: ThreatEvent[];
 }
 
 // Sub-node definitions for AETHER Virtual Honeypot Mesh
@@ -27,13 +30,19 @@ interface AetherNode {
 type ReconPattern = 'DIRECTORY_HARVEST' | 'QUANTUM_SNIFF' | 'API_SCRAPE' | 'LORA_WIRETAP';
 type TopologyMode = 'ELASTIC_MESH' | 'DEEP_HONEYGRID' | 'SHADOW_RECURSIVE' | 'STATIC_ANCHOR';
 
-export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddThreatEvent, profiles }) => {
+export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddThreatEvent, profiles, threatEvents = [] }) => {
   const [selectedLureId, setSelectedLureId] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [activeLevel, setActiveLevel] = useState<number | null>(null);
   const [stepOutput, setStepOutput] = useState<string[]>([]);
   const [isManualStep, setIsManualStep] = useState(false);
   const [isAutoScaleActive, setIsAutoScaleActive] = useState(true);
+
+  // Forensic Report Modal State
+  const [showForensicModal, setShowForensicModal] = useState(false);
+  const [forensicReportData, setForensicReportData] = useState<any>(null);
+  const [forensicReportJson, setForensicReportJson] = useState<string>('');
+  const [copiedReport, setCopiedReport] = useState(false);
 
   // AETHER Honeypot States
   const [topologyMode, setTopologyMode] = useState<TopologyMode>('ELASTIC_MESH');
@@ -200,7 +209,81 @@ export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddTh
         return `[ROUTE SPOOF] Intruder GET ${apis[Math.floor(Math.random() * apis.length)]} -> Redirection response payload HTTP 200 OK. Body: {"key_id": "${generateHex(12)}", "entropy_factor": 7.994}`;
       case 'LORA_WIRETAP':
         return `[MESH TELEMETRY ECHO] Gateway binding ID HB-9982-AX-2026 broadcast frame: Freq=915.22MHz, SpreadingFactor=SF7, Jitter=${Math.floor(Math.random() * 10 + 5)}ms. Noise ratio injection active.`;
+      default:
+        return '[TELEMETRY HOOK] Active canary trace running.';
     }
+  };
+
+  // Generate SIEM Forensic Report for Critical ThreatEvents
+  const handleGenerateForensicReport = () => {
+    // Filter all critical threat events
+    const criticalEvents = threatEvents.filter(e => e.level === ThreatLevel.CRITICAL);
+    const timeNow = new Date().toISOString();
+    const timestamp313 = temporalBinder.generateNanosecond313Timestamp();
+    const reportId = `SIEM-REPORT-CRIT-${Date.now()}`;
+    
+    // Seal into 313-BIND ledger
+    const receipt = temporalBinder.bind_receipt({
+      event: 'SIEM_FORENSIC_SNAPSHOT_EXPORT',
+      report_id: reportId,
+      critical_events_count: criticalEvents.length,
+      cadl_level: 'L5-LOCKDOWN'
+    }, 'siem_audit_engine', 'EXPORT_CRITICAL_FORENSICS');
+
+    const report = {
+      schema_version: "2.1.0-PQC",
+      compliance_framework: {
+        standard: "NIST SP 800-86 Guide to Integrating Forensic Techniques into Incident Response",
+        siem_format: "RFC 5424 / CEF / ECS v8.11",
+        cryptographic_certification: "FIPS 203 (ML-KEM-768) + FIPS 205 (SLH-DSA-128f)",
+        jurisdiction: "APEX SOVEREIGN C2 INFRASTRUCTURE"
+      },
+      audit_header: {
+        report_id: reportId,
+        export_timestamp_iso: timeNow,
+        timestamp_313_ns: timestamp313,
+        "313_bind_chain_index": receipt.bindIndex,
+        bind_hash_sha3_512: receipt.bindHash,
+        slh_dsa_signature: receipt.slhSig,
+        ipfs_merkle_cid: receipt.ipfsCid,
+        auditing_agent: "GHOST-WATCH-C2-TERMINAL",
+        total_threat_events_in_scope: threatEvents.length,
+        filtered_critical_events_count: criticalEvents.length
+      },
+      critical_threat_events: criticalEvents.map(evt => ({
+        event_id: evt.id,
+        timestamp_utc: evt.timestamp,
+        severity: evt.level,
+        source_vector: evt.source,
+        description: evt.description,
+        remediation_action: evt.actionTaken,
+        "313_bind_anchor": evt.bindIndex ? `#${evt.bindIndex}` : "UNBOUND_MIGRATED",
+        chain_bound: evt.chainBound ?? false,
+        hash_signature: evt.bindHash || receipt.bindHash
+      })),
+      containment_status: {
+        cadl_active_level: activeLevel !== null ? `L${activeLevel}` : "BASELINE_MONITOR",
+        cerberus_risk_index: `${riskScore}/100`,
+        aether_honeypot_engaged: aetherNodes.some(n => n.status !== 'SAFE'),
+        active_quarantined_nodes: ["LAE_Node_09", "185.220.101.5"]
+      }
+    };
+
+    const jsonStr = JSON.stringify(report, null, 2);
+    setForensicReportData(report);
+    setForensicReportJson(jsonStr);
+    setShowForensicModal(true);
+
+    // Trigger JSON download automatically
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `siem_forensic_audit_snapshot_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // Run escalation sequences proportionally
@@ -791,7 +874,7 @@ export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddTh
             </div>
 
             {/* Launch actions */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 id="btn-simulate-intrusion"
                 onClick={runEscalationSequence}
@@ -800,6 +883,16 @@ export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddTh
               >
                 <Flame className="w-4 h-4 mb-0.5 animate-pulse text-rose-400 hover:text-slate-950" />
                 Launch Dynamic Intrusion Response
+              </button>
+
+              <button
+                id="btn-generate-forensic-report"
+                onClick={handleGenerateForensicReport}
+                className="flex items-center justify-center gap-2 py-2 px-3 rounded border border-cyan-500/50 bg-cyan-950/30 hover:bg-cyan-500 hover:text-slate-950 text-cyan-300 font-bold transition-all cursor-pointer text-xs uppercase"
+                title="Filter critical threat events and export formatted JSON snapshot for SIEM audit-trail compliance"
+              >
+                <FileText className="w-4 h-4" />
+                Generate Forensic Report
               </button>
 
               {isManualStep && isRunning && activeLevel !== null && activeLevel < 5 && (
@@ -1004,6 +1097,105 @@ export const CadlManager: React.FC<CadlProps> = ({ lures, onTriggerLure, onAddTh
         </div>
 
       </div>
+
+      {/* SIEM Forensic Report Audit Snapshot Modal */}
+      {showForensicModal && forensicReportData && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-950 border border-cyan-500/50 rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl font-mono text-xs overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-900 bg-slate-900/60">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-cyan-400" />
+                <div className="flex flex-col">
+                  <span className="font-bold text-slate-100 uppercase tracking-widest text-xs">
+                    SIEM Forensic Audit Snapshot // Critical Threat Dossier
+                  </span>
+                  <span className="text-[10px] text-cyan-300">
+                    Compliant: NIST SP 800-86 | RFC 5424 | 313-BIND Anchored
+                  </span>
+                </div>
+              </div>
+              <button
+                id="btn-close-forensic-modal"
+                onClick={() => setShowForensicModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-100 rounded hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Summary Metadata Banner */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-slate-900/30 border-b border-slate-900 text-[10px]">
+              <div className="bg-slate-950 p-2 rounded border border-slate-900">
+                <span className="text-slate-500 block">REPORT ID:</span>
+                <span className="text-cyan-300 font-bold font-mono truncate block select-all">{forensicReportData.audit_header.report_id}</span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-900">
+                <span className="text-slate-500 block">CRITICAL EVENTS:</span>
+                <span className="text-rose-400 font-bold font-mono block">{forensicReportData.audit_header.filtered_critical_events_count} Incidents</span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-900">
+                <span className="text-slate-500 block">313-BIND ANCHOR:</span>
+                <span className="text-emerald-400 font-bold font-mono block">Block #{forensicReportData.audit_header['313_bind_chain_index']}</span>
+              </div>
+              <div className="bg-slate-950 p-2 rounded border border-slate-900">
+                <span className="text-slate-500 block">FIPS 205 SIGNATURE:</span>
+                <span className="text-amber-300 font-bold font-mono truncate block">SLH-DSA-128f VALIDATED</span>
+              </div>
+            </div>
+
+            {/* JSON Code Viewer */}
+            <div className="p-4 flex-1 overflow-y-auto bg-slate-950">
+              <span className="text-[10px] text-slate-500 block mb-1">
+                FORMATTED SIEM JSON SNAPSHOT (READY FOR INGESTION IN SPLUNK / ELASTIC / QRADAR):
+              </span>
+              <pre className="p-3 bg-slate-900/40 border border-slate-900 rounded text-[10px] text-cyan-300 font-mono whitespace-pre overflow-x-auto select-all selection:bg-cyan-500/30 leading-relaxed">
+                {forensicReportJson}
+              </pre>
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="p-3 border-t border-slate-900 bg-slate-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                <Check className="w-3.5 h-3.5" />
+                Snapshot downloaded to client filesystem and sealed to 313-BIND chain.
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  id="btn-copy-forensic-json"
+                  onClick={() => {
+                    navigator.clipboard.writeText(forensicReportJson);
+                    setCopiedReport(true);
+                    setTimeout(() => setCopiedReport(false), 2000);
+                  }}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  {copiedReport ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedReport ? 'Copied to Clipboard!' : 'Copy JSON'}
+                </button>
+                <button
+                  id="btn-redownload-forensic-json"
+                  onClick={() => {
+                    const blob = new Blob([forensicReportJson], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `siem_forensic_audit_snapshot_${Date.now()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Download JSON
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

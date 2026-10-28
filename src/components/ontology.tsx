@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { NetworkNode, NetworkLink, NodeType } from '../types';
-import { Network, Link as LinkIcon, Plus, User, FileCode, Shield, Activity, HelpCircle, Layers, Award, ToggleLeft, ToggleRight, Radio, Sliders, RefreshCw, Sparkles, EyeOff } from 'lucide-react';
+import { Network, Link as LinkIcon, Plus, User, FileCode, Shield, Activity, HelpCircle, Layers, Award, ToggleLeft, ToggleRight, Radio, Sliders, RefreshCw, Sparkles, EyeOff, Zap } from 'lucide-react';
+import { D3ForceGraph } from './d3_force_graph';
 
 interface OntologyProps {
   nodes: NetworkNode[];
@@ -17,6 +18,7 @@ export const OntologyEditor: React.FC<OntologyProps> = ({
   onAddLink,
   onTriggerAction,
 }) => {
+  const [graphMode, setGraphMode] = useState<'D3_FORCE' | 'KINETIC_GRID'>('D3_FORCE');
   const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null);
   const [showAddNodeModal, setShowAddNodeModal] = useState(false);
   const [showAddLinkModal, setShowAddLinkModal] = useState(false);
@@ -284,11 +286,11 @@ export const OntologyEditor: React.FC<OntologyProps> = ({
         {/* Animated matrix scanning grid line to indicate active security scanning */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30 animate-pulse pointer-events-none" />
 
-        <div className="flex justify-between items-center mb-4 z-10 bg-slate-950/95 py-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 z-10 bg-slate-950/95 py-1">
           <div className="flex items-center gap-2 font-mono">
             <Network className={`w-5 h-5 ${adaptiveDefenseActive ? 'text-fuchsia-400 animate-spin' : 'text-emerald-400 animate-pulse'}`} />
             <span className="font-display font-medium text-slate-200 tracking-wider flex items-center gap-2">
-              PALANTIR ONTOLOGICAL KINETIC GRAPH
+              PALANTIR ONTOLOGICAL TARGET MODEL
               {adaptiveDefenseActive && (
                 <span className="text-[9px] px-1.5 py-0.5 border border-fuchsia-500/80 bg-fuchsia-950/40 text-fuchsia-400 animate-pulse rounded uppercase font-bold">
                   TOPOLOGY ADAPTATION ACTIVE
@@ -296,7 +298,32 @@ export const OntologyEditor: React.FC<OntologyProps> = ({
               )}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Mode Switcher and Object creation actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded text-[10px]">
+              <button
+                id="btn-view-d3-force"
+                onClick={() => setGraphMode('D3_FORCE')}
+                className={`px-2.5 py-1 rounded cursor-pointer font-bold flex items-center gap-1 transition-colors ${
+                  graphMode === 'D3_FORCE' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Zap className="w-3 h-3 text-cyan-400" />
+                D3.js Force Simulation
+              </button>
+              <button
+                id="btn-view-kinetic-grid"
+                onClick={() => setGraphMode('KINETIC_GRID')}
+                className={`px-2.5 py-1 rounded cursor-pointer font-bold flex items-center gap-1 transition-colors ${
+                  graphMode === 'KINETIC_GRID' ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Network className="w-3 h-3 text-fuchsia-400" />
+                Cognitive Kinetic Grid
+              </button>
+            </div>
+
             <button
               id="btn-add-object"
               onClick={() => setShowAddNodeModal(true)}
@@ -314,25 +341,31 @@ export const OntologyEditor: React.FC<OntologyProps> = ({
           </div>
         </div>
 
-        {/* SVG Nodes & Links visualization */}
-        <div className="relative border border-slate-900 bg-slate-950/60 rounded flex-1 min-h-[400px]">
-          {/* Legend */}
-          <div className="absolute top-2 left-2 z-10 flex flex-wrap gap-2 text-[10px] bg-slate-950/85 p-2 rounded border border-slate-900/80">
-            <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-emerald-500/20 border border-emerald-500 rounded-full inline-block"></span> C2 Root</div>
-            <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-amber-500/20 border border-amber-500 rounded-full inline-block"></span> Canary Lure</div>
-            <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-rose-500/20 border border-rose-500 rounded-full inline-block"></span> Adversary</div>
-            <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-cyan-500/20 border border-cyan-500 rounded-full inline-block"></span> Device Node</div>
-            {adaptiveDefenseActive && (
-              <div className="flex items-center gap-1 text-fuchsia-400 font-bold"><span className="w-2.5 h-2.5 bg-fuchsia-500/20 border border-fuchsia-400 dashed rounded-full inline-block animate-ping"></span> Spoof Chaff</div>
-            )}
-          </div>
-
-          {adaptiveDefenseActive && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-slate-950/95 border border-fuchsia-500/60 px-3.5 py-2 rounded shadow-lg backdrop-blur-sm text-[9px] text-fuchsia-300 font-mono select-none border-dashed animate-pulse max-w-[95%] text-center">
-              <RefreshCw className="w-3 h-3 text-fuchsia-400 animate-spin flex-shrink-0" />
-              <span>TOPOLOGY ADAPTATION MODE ACTIVE: RESTUCTURING NODES & SCRAMBLING NETWORK MAPS TO DEFEAT RECONNAISSANCE</span>
+        {graphMode === 'D3_FORCE' ? (
+          <D3ForceGraph
+            onSelectNode={setSelectedNode}
+            onTriggerAction={onTriggerAction}
+          />
+        ) : (
+          /* SVG Nodes & Links visualization */
+          <div className="relative border border-slate-900 bg-slate-950/60 rounded flex-1 min-h-[400px]">
+            {/* Legend */}
+            <div className="absolute top-2 left-2 z-10 flex flex-wrap gap-2 text-[10px] bg-slate-950/85 p-2 rounded border border-slate-900/80">
+              <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-emerald-500/20 border border-emerald-500 rounded-full inline-block"></span> C2 Root</div>
+              <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-amber-500/20 border border-amber-500 rounded-full inline-block"></span> Canary Lure</div>
+              <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-rose-500/20 border border-rose-500 rounded-full inline-block"></span> Adversary</div>
+              <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-cyan-500/20 border border-cyan-500 rounded-full inline-block"></span> Device Node</div>
+              {adaptiveDefenseActive && (
+                <div className="flex items-center gap-1 text-fuchsia-400 font-bold"><span className="w-2.5 h-2.5 bg-fuchsia-500/20 border border-fuchsia-400 dashed rounded-full inline-block animate-ping"></span> Spoof Chaff</div>
+              )}
             </div>
-          )}
+
+            {adaptiveDefenseActive && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-slate-950/95 border border-fuchsia-500/60 px-3.5 py-2 rounded shadow-lg backdrop-blur-sm text-[9px] text-fuchsia-300 font-mono select-none border-dashed animate-pulse max-w-[95%] text-center">
+                <RefreshCw className="w-3 h-3 text-fuchsia-400 animate-spin flex-shrink-0" />
+                <span>TOPOLOGY ADAPTATION MODE ACTIVE: RESTUCTURING NODES & SCRAMBLING NETWORK MAPS TO DEFEAT RECONNAISSANCE</span>
+              </div>
+            )}
 
           <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="absolute inset-0">
             <defs>
@@ -580,7 +613,8 @@ export const OntologyEditor: React.FC<OntologyProps> = ({
             })}
           </svg>
         </div>
-      </div>
+      )}
+    </div>
 
       {/* Ontological Details & Action Side Panel */}
       <div className="lg:col-span-4 flex flex-col gap-4">
